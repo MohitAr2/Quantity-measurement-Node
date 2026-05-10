@@ -1,63 +1,78 @@
-// Mirrors Java QuantityRepository (JpaRepository).
-// Uses pg (PostgreSQL) — placeholders are $1, $2, ... not ?
+// JSON file-based "DB" — reads and writes to data/db.json
+// Mirrors the same method names as before so nothing else needs to change.
 
-const { pool } = require("../db");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+
+const DB_PATH = path.join(__dirname, "../../data/db.json");
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function readAll() {
+  const raw = fs.readFileSync(DB_PATH, "utf-8");
+  return JSON.parse(raw);
+}
+
+function writeAll(records) {
+  fs.writeFileSync(DB_PATH, JSON.stringify(records, null, 2));
+}
+
+// ─── Repository ───────────────────────────────────────────────────────────────
 
 const QuantityRepository = {
-    // mirrors: repo.save(entity)
-    // pg returns the inserted row via RETURNING *
-    save: async ({ inputValue, unit, measurementType, resultValue, resultUnit, operation, isError, errorMessage }) => {
-        const { rows } = await pool.query(
-            `INSERT INTO quantity_measurements
-         (input_value, unit, measurement_type, result_value, result_unit, operation, is_error, error_message)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-            [inputValue, unit, measurementType, resultValue, resultUnit, operation, isError, errorMessage || null]
-        );
-        return rows[0];
-    },
 
-    // mirrors: repo.findAll()
-    findAll: async () => {
-        const { rows } = await pool.query(
-            "SELECT * FROM quantity_measurements ORDER BY created_on DESC"
-        );
-        return rows;
-    },
+  // mirrors: repo.save(entity)
+  save: ({ inputValue, unit, measurementType, resultValue, resultUnit, operation, isError, errorMessage }) => {
+    const records = readAll();
 
-    // mirrors: repo.findByOperation(operation)
-    findByOperation: async (operation) => {
-        const { rows } = await pool.query(
-            "SELECT * FROM quantity_measurements WHERE operation = $1 ORDER BY created_on DESC",
-            [operation.toUpperCase()]
-        );
-        return rows;
-    },
+    const newRecord = {
+      id:              crypto.randomUUID(),
+      input_value:     inputValue,
+      unit:            unit,
+      measurement_type: measurementType,
+      result_value:    resultValue,
+      result_unit:     resultUnit,
+      operation:       operation,
+      is_error:        isError,
+      error_message:   errorMessage || null,
+      created_on:      new Date().toISOString(),
+    };
 
-    // mirrors: repo.findByErrorTrue()
-    findByErrorTrue: async () => {
-        const { rows } = await pool.query(
-            "SELECT * FROM quantity_measurements WHERE is_error = TRUE ORDER BY created_on DESC"
-        );
-        return rows;
-    },
+    records.push(newRecord);
+    writeAll(records);
+    return newRecord;
+  },
 
-    // mirrors: repo.findById(id)
-    findById: async (id) => {
-        const { rows } = await pool.query(
-            "SELECT * FROM quantity_measurements WHERE id = $1",
-            [id]
-        );
-        return rows[0] || null;
-    },
+  // mirrors: repo.findAll()
+  findAll: () => {
+    return readAll().sort((a, b) => new Date(b.created_on) - new Date(a.created_on));
+  },
 
-    // mirrors Java TODO: "update and delete are ops on the DB directly"
-    deleteById: async (id) => {
-        await pool.query(
-            "DELETE FROM quantity_measurements WHERE id = $1",
-            [id]
-        );
-    },
+  // mirrors: repo.findByOperation(operation)
+  findByOperation: (operation) => {
+    return readAll()
+      .filter((r) => r.operation === operation.toUpperCase())
+      .sort((a, b) => new Date(b.created_on) - new Date(a.created_on));
+  },
+
+  // mirrors: repo.findByErrorTrue()
+  findByErrorTrue: () => {
+    return readAll()
+      .filter((r) => r.is_error === true)
+      .sort((a, b) => new Date(b.created_on) - new Date(a.created_on));
+  },
+
+  // mirrors: repo.findById(id)
+  findById: (id) => {
+    return readAll().find((r) => r.id === id) || null;
+  },
+
+  // mirrors Java TODO: "update and delete are ops on the DB directly" can add a flag as a delted or not check soft del
+  deleteById: (id) => {
+    const records = readAll().filter((r) => r.id !== id);
+    writeAll(records);
+  },
 };
 
 module.exports = QuantityRepository;

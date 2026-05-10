@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fbf297f1-f234-4276-a8fc-963af464fde1",
+    "input_value": 100,
+    "unit": "CENTIMETER",
+    "measurement_type": "LENGTH",
+    "result_value": 1,
+    "result_unit": "METER",
+    "operation": "CONVERT",
+    "is_error": false,
+    "error_message": null,
+    "created_on": "2026-05-10T14:10:19.785Z"
+  },
+  {
+    "id": "be3e2636-4949-41f2-ad82-68d2095ebc20",
+    "input_value": 100,
+    "unit": "CELSIUS",
+    "measurement_type": "TEMPERATURE",
+    "result_value": 212,
+    "result_unit": "FAHRENHEIT",
+    "operation": "CONVERT",
+    "is_error": false,
+    "error_message": null,
+    "created_on": "2026-05-10T14:15:22.594Z"
+  },
+  {
+    "id": "4c6e767b-c977-4d38-bc87-be96049b90c1",
+    "input_value": 1,
+    "unit": "KILOGRAM",
+    "measurement_type": "MASS",
+    "result_value": 1000,
+    "result_unit": "GRAM",
+    "operation": "CONVERT",
+    "is_error": false,
+    "error_message": null,
+    "created_on": "2026-05-10T14:16:12.817Z"
+  }
+]
