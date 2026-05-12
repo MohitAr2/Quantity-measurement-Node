@@ -27,16 +27,16 @@ const QuantityRepository = {
     const records = readAll();
 
     const newRecord = {
-      id:              crypto.randomUUID(),
-      input_value:     inputValue,
-      unit:            unit,
+      id: crypto.randomUUID(),
+      input_value: inputValue,
+      unit: unit,
       measurement_type: measurementType,
-      result_value:    resultValue,
-      result_unit:     resultUnit,
-      operation:       operation,
-      is_error:        isError,
-      error_message:   errorMessage || null,
-      created_on:      new Date().toISOString(),
+      result_value: resultValue,
+      result_unit: resultUnit,
+      operation: operation,
+      is_error: isError,
+      error_message: errorMessage || null,
+      created_on: new Date().toISOString(),
     };
 
     records.push(newRecord);
@@ -49,6 +49,11 @@ const QuantityRepository = {
     return readAll().sort((a, b) => new Date(b.created_on) - new Date(a.created_on));
   },
 
+  findByAllOperations: () => {
+    return readAll()
+      .filter((r) => r.operation === "ADD" || r.operation === "SUB" || r.operation === "DIV" || r.operation === "MUL")
+      .sort((a, b) => new Date(b.created_on) - new Date(a.created_on));
+  },
   // mirrors: repo.findByOperation(operation)
   findByOperation: (operation) => {
     return readAll()

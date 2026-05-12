@@ -2,10 +2,8 @@ const express = require("express");
 const router = express.Router();
 const QuantityService = require("../services/QuantityService");
 const OperationType = require("../models/OperationType");
-
+const QuantityRepository = require("../repo/QuantityRepository")
 const VALID_OPS = Object.values(OperationType);
-
-// ─── GET ──────────────────────────────────────────────────────────────────────
 
 router.get("/history", (req, res, next) => {
   try { res.json(QuantityService.getAll()); }
@@ -17,26 +15,28 @@ router.get("/convert", (req, res, next) => {
   catch (err) { next(err); }
 });
 
-router.get("/compare", (req, res, next) => {
-  try { res.json(QuantityService.getByOperation(OperationType.CONVERT)); }
-  catch (err) { next(err); }
-});
-
+// router.get("/compare", (req, res, next) => {
+//   try { res.json(QuantityService.getByOperation(OperationType.COMPARE)); }
+//   catch (err) { next(err); }
+// });
 router.get("/operations", (req, res, next) => {
   try {
     const { type } = req.query;
-    if (!type){
+    if (type == null) {
+      return res.status(201).json(QuantityRepository.findByAllOperations()) // all ops 
+    }
+    if (!type) {
       // store in result though ?
       const saved = QuantityRepository.save({
-      inputValue:      [request.from.value,request.to.value],
-      unit:            request.from.unit.toUpperCase(),
-      measurementType: fromUnit.measurementType,
-      resultValue:     result,
-      resultUnit:      request.to.unit.toUpperCase(),
-      operation:       OperationType.CONVERT,
-      isError:         true,
-    });
-       return res.status(400).json({ error: true, message: "Query param 'type' required. Options: " + VALID_OPS.join(", ") });
+        inputValue: [request.from.value, request.to.value],
+        unit: request.from.unit.toUpperCase(),
+        measurementType: fromUnit.measurementType,
+        resultValue: result,
+        resultUnit: request.to.unit.toUpperCase(),
+        operation: OperationType.CONVERT,
+        isError: true,
+      });
+      return res.status(400).json({ error: true, message: "Query param 'type' required. Options: " + VALID_OPS.join(", ") });
     }
     res.json(QuantityService.getByOperation(type.toUpperCase()));
   } catch (err) { next(err); }
@@ -57,16 +57,16 @@ router.post("/convert", (req, res, next) => {
 router.post("/operation", (req, res, next) => {
   try {
     const { type } = req.query;
-    if (!type || !VALID_OPS.includes(type.toUpperCase())){
+    if (!type || !VALID_OPS.includes(type.toUpperCase())) {
       const saved = QuantityRepository.save({
-      inputValue:      [request.from.value,request.to.value],
-      unit:            request.from.unit.toUpperCase(),
-      measurementType: fromUnit.measurementType,
-      resultValue:     result,
-      resultUnit:      request.to.unit.toUpperCase(),
-      operation:       OperationType.CONVERT,
-      isError:         true,
-    });
+        inputValue: [request.from.value, request.to.value],
+        unit: request.from.unit.toUpperCase(),
+        measurementType: fromUnit.measurementType,
+        resultValue: result,
+        resultUnit: request.to.unit.toUpperCase(),
+        operation: OperationType.CONVERT,
+        isError: true,
+      });
       return res.status(400).json({ error: true, message: "Query param 'type' must be one of: " + VALID_OPS.join(", ") });
     }
     const { from, to } = req.body;

@@ -34,5 +34,29 @@
     "is_error": false,
     "error_message": null,
     "created_on": "2026-05-10T14:16:12.817Z"
+  },
+  {
+    "id": "57ba00df-3e4e-410d-8f8f-307fcc2c067a",
+    "input_value": 100,
+    "unit": "CENTIMETER",
+    "measurement_type": "LENGTH",
+    "result_value": 1,
+    "result_unit": "METER",
+    "operation": "CONVERT",
+    "is_error": false,
+    "error_message": null,
+    "created_on": "2026-05-12T05:13:28.769Z"
+  },
+  {
+    "id": "7538543a-b7d9-4044-a0f6-459c00d8a901",
+    "input_value": 1,
+    "unit": "KILOMETER",
+    "measurement_type": "LENGTH",
+    "result_value": 1500,
+    "result_unit": "KILOMETER",
+    "operation": "ADD",
+    "is_error": false,
+    "error_message": null,
+    "created_on": "2026-05-12T05:52:24.555Z"
   }
 ]
